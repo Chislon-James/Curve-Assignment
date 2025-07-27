@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Eflex Codes</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  
+  <div id="root"></div>
+
+  
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  
+  <script type="text/babel">
+
+    const Header = () => {
+      return (
+       <header className='header'>
+           <div className='logo' >
+             <span>Efflex Code</span>
+           </div>
+            <div className='nav' >
+                <p>Home</p>
+                <p>About</p>
+                <p>Services</p>
+                <p>Contact</p>
+            </div>
+            <div className='btn'>
+              <button onClick={() => alert("Get Started")} className="btn">Get Started</button>
+              <button  onClick={() => alert("Login")} className="btn" >Login</button>
+            </div>          
+        </header>
+      );
+    };
+
+    
+    const UserInput = ({ onAddPost }) => {
+       const [userName, setUserName] = useState('')
+       const [quote, setQuote] = useState('')
+    
+
+      const handleSubmit = () => {
+       if (!userName.trim() || !quote.trim()) {
+          alert("Please fill in both fields");
+          return;
+        }
+        const initials = userName.split(" ").map(word => word[0].toUpperCase()).join("");
+        
+        const newPost = { id: Date.now(), name: userName, quote: quote,   initials , date: new Date().toLocaleDateString() };
+
+         onAddPost(newPost);  
+        setUserName("");     
+        setQuote("");   
+     };
+
+      return (
+        
+            <div>
+                <div className='inputs'>
+                    <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)}  placeholder='Enter your name'/>
+                    
+                    
+                    <textarea placeholder='Enter your quotes' value={quote} onChange={e => setQuote(e.target.value)}></textarea>
+                </div>  
+                <div>
+                    <button className='submit' onClick={handleSubmit}>Submit</button>
+                </div>
+            </div>
+      );
+    };
+
+
+    const PostCard = ({ posts }) => {
+      return (
+        <div>
+      {
+        posts.map( e => 
+        <div key={e.id} className="postcard">
+            <div className="initial">
+                <div>{e.initials}</div>
+                <h2 >{e.name}</h2>
+                <div></div>
+            </div>
+            <div className="quotes">
+                {e.quote}
+            </div>
+            <p className="date">{e.date}</p>
+        </div>
+        )
+      }
+    </div>
+      );
+    };
+
+    
+    const App = () => {
+      const [posts, setPosts] = React.useState([]);
+
+        React.useEffect(() => {
+         const saved = JSON.parse(localStorage.getItem("posts")) || [];
+        setPosts(saved);
+        }, []);
+
+      const handleAddPost = (post) => {
+        const updatedPosts = [post, ...posts]; 
+        setPosts(updatedPosts);
+        localStorage.setItem("posts", JSON.stringify(updatedPosts));
+      };
+
+      return (
+        <div>
+          <Header />
+          <h2>Submit a Quote</h2>
+          <UserInput onAddPost={handleAddPost} />
+          <h3>All Quotes</h3>
+          <PostCard posts={posts} />
+        </div>
+      );
+    };
+
+    
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</body>
+</html>
